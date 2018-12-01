@@ -67,7 +67,7 @@ bl_info = {
     "description": "Import and export files in the NetImmerse/Gamebryo nif format (.nif)",
     "author": "NifTools Team",
     "version": (2, 6, 0),  # can't read from VERSION, blender wants it hardcoded
-    "blender": (2, 7, 7),
+    "blender": (2, 80, 0),
     "api": 39257,
     "location": "File > Import-Export",
     "warning": "partially functional, port from 2.49 series still in progress",
@@ -92,6 +92,7 @@ def _init_loggers():
 
 
 # noinspection PyUnusedLocal
+from .operators.nif_import_op import NifImportOperator
 def menu_func_import(self, context):
     self.layout.operator(operators.nif_import_op.NifImportOperator.bl_idname, text="NetImmerse/Gamebryo (.nif)")
     # TODO: get default path from config registry
@@ -100,25 +101,31 @@ def menu_func_import(self, context):
 
 
 # noinspection PyUnusedLocal
+from .operators.nif_export_op import NifExportOperator
 def menu_func_export(self, context):
     self.layout.operator(operators.nif_export_op.NifExportOperator.bl_idname, text="NetImmerse/Gamebryo (.nif)")
 
+# tuple for holding classes for registration in Blender 2.80
+#from io_scene_nif import NifCommon
+classes = (
+    #properties,
+    #ui
+    NifImportOperator,
+    NifExportOperator
+)
+
+from bpy.utils import register_class, unregister_class
 
 def register():
-    _init_loggers()
-    properties.register()
-    ui.register()
-    bpy.utils.register_module(__name__)
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
-    bpy.types.INFO_MT_file_export.append(menu_func_export)
-
+    _init_loggers()  
+    for cls in classes:
+        register_class(cls)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
 
 def unregister():
-    # no idea how to do this... oh well, let's not lose any sleep over it uninit_loggers()
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
-    bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.utils.unregister_module(__name__)
-
+    for cls in reversed(classes):
+        unregister_class(cls)
 
 if __name__ == "__main__":
     register()

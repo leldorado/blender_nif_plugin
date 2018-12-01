@@ -6,3 +6,6 @@ docs/refresh_python_api.bat
 docs/refresh_python_api.lnk
 *.idea
 install/temp
+io_scene_nif/dependencies/pyffi
+io_scene_nif/dependencies/bpy
+NIF-BLENDER-PLUGIN-2-80.code-workspace
